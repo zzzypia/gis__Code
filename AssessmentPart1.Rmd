@@ -1,14 +1,18 @@
 ---
-title: "R Notebook"
+title: "Assess1"
 output:
   html_document:
     df_print: paged
   pdf_document: default
+  word_document: default
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ 
 
 ```{r}
 library(tidyverse)
@@ -36,7 +40,6 @@ BoroughMapSF <- read_shape("N:\\GIS\\WK1\\BoundaryData\\england_lad_2011.shp", a
 BoroughMapSP <- LondonMap
 qtm(BoroughMapSF)
 
-BoroughMapSP@data <- data.frame(BoroughMapSP@data,LondonData[match(BoroughMapSP@data[,"code"],LondonData[,"New.code"]),])
 BoroughDataMap <- append_data(BoroughMapSF,LondonData, key.shp = "code", key.data = "New.code", ignore.duplicates = TRUE)
 
 
