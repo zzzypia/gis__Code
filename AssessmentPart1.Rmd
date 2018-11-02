@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+LondonData <- read_csv("https://files.datapress.com/london/dataset/ward-profiles-and-atlas/2015-09-24T14:21:24/ward-profiles-excel-version.csv", na = "n/a")
+LondonData <- data.frame(LondonData)
+LondonBoroughs <- LondonData[grep("^E09",LondonData[,3]),]
+
+library(maptools)
+library(RColorBrewer)
+library(classInt)
+library(OpenStreetMap)
+library(sp)
+library(rgeos)
+library(tmap)
+library(tmaptools)
+library(sf)
+library(rgdal)
+library(geojsonio)
+
+EW <- geojson_read("http://geoportal.statistics.gov.uk/datasets/8edafbe3276d4b56aec60991cbddda50_2.geojson", what = "sp")
+LondonMap <- EW[grep("^E09",EW@data$lad15cd),]
+qtm(LondonMap)
+
+BoroughMapSF <- read_shape("N:\\GIS\\WK1\\BoundaryData\\england_lad_2011.shp", as.sf = TRUE)
+BoroughMapSP <- LondonMap
+qtm(BoroughMapSF)
+
+BoroughMapSP@data <- data.frame(BoroughMapSP@data,LondonData[match(BoroughMapSP@data[,"code"],LondonData[,"New.code"]),])
+BoroughDataMap <- append_data(BoroughMapSF,LondonData, key.shp = "code", key.data = "New.code", ignore.duplicates = TRUE)
+
+
+library(tmap)
+library(tmaptools)
+tmap_mode("plot")
+
+qtm(BoroughDataMap, fill = "Number.of.jobs.in.area...2013")
+
+london_osm <- read_osm(BoroughDataMap, type = "esri", zoom = NULL)
+qtm(london_osm) + 
+  tm_shape(BoroughDataMap) + 
+  tm_polygons("Number.of.jobs.in.area...2013", 
+              style="jenks",
+              palette="OrRd",
+              midpoint=NA,
+              alpha = 0.5) + 
+  tm_compass(position = c("right", "top"),type = "arrow") + 
+  tm_scale_bar(position = c("left", "bottom")) +
+  tm_layout(title = "Number of jobs,2013", legend.position = c("right", "bottom"))
+```
+
