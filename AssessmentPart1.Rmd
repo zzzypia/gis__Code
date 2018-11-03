@@ -34,11 +34,9 @@ library(geojsonio)
 
 EW <- geojson_read("http://geoportal.statistics.gov.uk/datasets/8edafbe3276d4b56aec60991cbddda50_2.geojson", what = "sp")
 LondonMap <- EW[grep("^E09",EW@data$lad15cd),]
-qtm(LondonMap)
 
 BoroughMapSF <- read_shape("N:\\GIS\\WK1\\BoundaryData\\england_lad_2011.shp", as.sf = TRUE)
 BoroughMapSP <- LondonMap
-qtm(BoroughMapSF)
 
 BoroughDataMap <- append_data(BoroughMapSF,LondonData, key.shp = "code", key.data = "New.code", ignore.duplicates = TRUE)
 
